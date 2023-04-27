@@ -12,15 +12,6 @@ MyString::MyString() {
 	*s = '\0';
 }
 
-// Конструктор от строки
-MyString::MyString(const char* t) {
-	s = new char[MAX_SIZE + strlen(t)];
-	*s = '\0';
-	strcpy_s(s, strlen(t) + 1, t);
-	cur = &s[strlen(t)];
-	len = MAX_SIZE + strlen(t);
-}
-
 // Конструктор копирования
 MyString::MyString(const MyString& t) {
 	s = new char[MAX_SIZE + t.len];
@@ -28,6 +19,15 @@ MyString::MyString(const MyString& t) {
 	strcpy_s(s, strlen(t.s) + 1, t.s);
 	cur = &s[strlen(t.s)];
 	len = MAX_SIZE + t.len;
+}
+
+// Конструктор от строки
+MyString::MyString(const char* t) {
+	s = new char[MAX_SIZE + strlen(t)];
+	*s = '\0';
+	strcpy_s(s, strlen(t) + 1, t);
+	cur = &s[strlen(t)];
+	len = MAX_SIZE + strlen(t);
 }
 
 // Деструктор
@@ -45,14 +45,38 @@ int MyString::length() const {
 	return len;
 }
 
+// Получение i-того символа строки
+char& MyString::item(int i) {
+	char err = 'e';
+	if (i < len && i >= 0)
+		return s[i];
+	else
+		std::cout << "Error" << std::endl;
+	return err;
+}
+
 // Создание копии объекта в динамической памяти
 MyString* MyString::copy() {
 	return new MyString(*this);
 }
 
+// Замена перегруженного оператора =
+void MyString::assign(const MyString& t) {
+	s = new char[t.len + 1];
+	*s = '\0';
+	strcpy_s(s, strlen(t.s) + 1, t.s);
+	cur = &s[strlen(t.s)];
+	len = t.len;
+}
+
 // Сравнение двух строк
-int MyString::cmp(const MyString& t) {
+int MyString::cmp(const MyString& t) const {
 	return strcmp(s, t.s);
+}
+
+// Проверка строк на равенство
+int MyString::equal(const MyString& t) const {
+	return strcmp(s, t.s) == 0;
 }
 
 // Ввод строки
@@ -66,21 +90,19 @@ int MyString::input(std::istream& cin) {
 	if (strlen(buf) == 0)
 		cin.getline(buf, MAX_SIZE - 2, '\n');
 
-	s = new char[strlen(buf) + 1];
+	s = new char[MAX_SIZE + strlen(buf)];
 
 	len = MAX_SIZE + strlen(buf);
 	*s = '\0';
 	strcpy_s(s, strlen(buf) + 1, buf);
-	cur = &s[strlen(buf)];
 	return 0;
 }
 
 // Вывод строки на экран
-int MyString::output(std::ostream& cout) {
+void MyString::output(std::ostream& cout)const {
 	for (char* i = s; i < cur; i++)
 		cout << *i;
 	cout << std::endl;
-	return 0;
 }
 
 // Начало новых функций
@@ -110,6 +132,7 @@ int MyString::find(int first, int last, const MyString& item) {
 	/*
 	fisrt, last - отражают ЧЕЛОВЕЧЕСКИЙ номер
 	Ищет с позиции first по позицию last включительно
+	Возвращает КОМПЬЮТЕРНЫЙ номер
 	*/
 
 	// Проверка first и last на правильность, а строки-аргумента на существование
@@ -146,13 +169,12 @@ MyString MyString::substring(int pos, int count) {
 	pos = len + 1 -> недопустимо
 	*/
 
-	MyString newString;
-	char* buf = new char[5256];
+	char buf[MAX_SIZE];
 
 	// Проверка pos и count на правильность
-	if (pos <= 0 || pos > realSize() /*|| count > realSize() - pos - 1*/) {
+	if (pos <= 0 || pos > realSize() || count > realSize() - pos + 1) {
 		std::cout << "Error in substring function, class MyString" << std::endl;
-		return newString; // Возврат пустой строки
+		return MyString();
 	}
 
 	int index = 0;
@@ -162,9 +184,7 @@ MyString MyString::substring(int pos, int count) {
 	}
 	buf[index] = '\0';
 
-	MyString newString2(buf);
-
-	return newString2;
+	return MyString(buf);
 }
 
 // Удаление символов из строки
@@ -177,25 +197,14 @@ int MyString::erase(int pos, int count) {
 	count - число символов, которое будет стёрто
 	*/
 
-	// Проверка pos на правильность
-	if (pos <= 0 || pos > realSize()) {
+	// Проверка pos и count на правильность
+	if (pos <= 0 || pos > realSize() || count < 0 || count > realSize()) {
 		std::cout << "Error in erase function, class MyString" << std::endl;
 		return -1;
 	}
 
-	// Проверка count на правильность
-	if (count < 0 || count > realSize()) {
-		std::cout << "Error in erase function, class MyString" << std::endl;
-		return -1;
-	}
-
-	char sym = s[pos - 1];
-	int shift = 0;
-	while (sym != '\0') {
-		s[pos - 1 + shift] = s[pos - 1 + count + shift];
-		shift++;
-		sym = s[pos - 1 + shift];
-	}
+	for (int i = pos - 1; s[i] != '\0'; i++)
+		s[i] = s[i + count];
 
 	cur -= count;
 
@@ -252,20 +261,26 @@ int MyString::remove(int first, int last, const MyString& item) {
 
 	int index = find(first, last, item);
 
-	if (index != -1) {
-		int oldSize = realSize();
-		for (int i = 0; i < item.realSize(); i++) {
+	int len1 = realSize();
+	int len2 = item.realSize();
+
+	while (index != -1) {
+		for (int i = 0; i < len2; i++) {
 			for (int j = index; s[j] != '\0'; j++)
 				s[j] = s[j + 1];
 			cur--;
+			len1--;
 		}
+		if (len1 > len2)
+			index = find(len1 - len2, len1, item);
+		else
+			index = -1;
 	}
 
 	return 0;
 }
 
 // Замена подстроки в строке на другую подстроку
-// заменить
 int MyString::replace(int first, int last, const MyString& oldString, const MyString& newString) {
 	/*
 	fisrt, last - отражают ЧЕЛОВЕЧЕСКИЙ номер
@@ -280,9 +295,19 @@ int MyString::replace(int first, int last, const MyString& oldString, const MySt
 
 	int index = find(first, last, oldString);
 
-	if (index != -1) {
+	int len1 = realSize();
+	int len2 = newString.realSize();
+	int shift = len2 - oldString.realSize();
+
+	while (index != -1) {
+		// Проверка на достаточность свободного места
+		if (len - len1 - 1 < len2) {
+			resize(len + len2);
+			len1 = realSize();
+		}
 		remove(first, last, oldString);
 		insert(index + 1, newString);
+		index = find(first, last + shift, oldString);
 	}
 
 	return 0;
@@ -303,19 +328,23 @@ MyString* MyString::split(int& count, char c) {
 	char* buf = new char[len];
 	char* cur = &buf[0];
 
-	for (int j = 0; s[j] != '\0'; j++) {
-		if (s[j] == c) {
+	for (int i = 0; s[i] != '\0'; i++) {
+		if (s[i] == c) {
 			*cur = '\0';
+			if (len < strlen(arr[arrIndex].s))
+				arr[arrIndex].resize(len);
 			strcpy(arr[arrIndex].s, buf);
 			arr[arrIndex].cur = &arr[arrIndex].s[strlen(buf)];
 			arrIndex++;
 			cur = &buf[0];
 			continue;
 		}
-		*cur = s[j];
+		*cur = s[i];
 		cur++;
 	}
 	*cur = '\0';
+	if (len < strlen(arr[arrIndex].s))
+		arr[arrIndex].resize(len);
 	strcpy(arr[arrIndex].s, buf);
 	arr[arrIndex].cur = &arr[arrIndex].s[strlen(buf)];
 
@@ -353,21 +382,28 @@ MyString* MyString::split(const MyString& splits, int& count) {
 	MyString* arr = new MyString[count];
 	int index = 0, arrIndex = 0;
 
-	for (int i = 0; i < count; i++) {
-		MyString temp;
-		for (int j = index; copy.s[j] != ' ' && copy.s[j] != '\0'; j++) {
-			char* t = new char[2];
-			t[0] = copy.s[j];
-			t[1] = '\0';
-			MyString myChar(t);
-			temp.insert(temp.realSize() + 1, myChar);
-			delete[] t;
-			index = j;
+	char* buf = new char[len];
+	char* cur = &buf[0];
+
+	for (int i = 0; copy.s[i] != '\0'; i++) {
+		if (copy.s[i] == ' ') {
+			*cur = '\0';
+			if (len < strlen(arr[arrIndex].s))
+				arr[arrIndex].resize(len);
+			strcpy(arr[arrIndex].s, buf);
+			arr[arrIndex].cur = &arr[arrIndex].s[strlen(buf)];
+			arrIndex++;
+			cur = &buf[0];
+			continue;
 		}
-		index += 2;
-		arr[arrIndex] = temp;
-		arrIndex++;
+		*cur = copy.s[i];
+		cur++;
 	}
+	*cur = '\0';
+	if (len < strlen(arr[arrIndex].s))
+		arr[arrIndex].resize(len);
+	strcpy(arr[arrIndex].s, buf);
+	arr[arrIndex].cur = &arr[arrIndex].s[strlen(buf)];
 
 	return arr;
 }
@@ -418,110 +454,4 @@ MyString MyString::join(MyString* arr, int count, char c) {
 	}
 
 	return res;
-}
-
-// Перегрузка операторов
-
-// Оператор присваивания
-MyString& MyString::operator=(const MyString& t) {
-	// Предотвращает удаление содержимого объекта при присваивании самому себе
-	if (this == &t)
-		return *this;
-
-	delete[] s;
-	s = new char[t.len + 1];
-	strcpy_s(s, strlen(t.s) + 1, t.s);
-	cur = &s[strlen(t.s)];
-	len = t.len;
-
-	return *this;
-}
-
-// Оператор преобразования типа из MyString в char*
-MyString::operator char* () {
-	/*
-	Не указывается возвращаемое значение
-	Имя совпадает с именем типа
-	Отсутствуют аргументы
-	Создание копии оставляет стринг s доступным только через интерфейс класса,
-	защищая его от неправильного использования
-	*/
-	char* p = new char[len + 1];
-	strcpy(p, s);
-	return p;
-}
-
-// Оператор индексирования символов
-char& MyString::operator[](int i) {
-	if (i >= 0 && i < realSize())
-		return s[i];
-	std::cout << "Index error" << std::endl;
-	exit(1);
-}
-
-// Оператор добавления в конец строки
-MyString& MyString::operator+=(const MyString& t) {
-	int len1 = realSize();
-	int len2 = t.realSize();
-
-	len = len + t.len;
-	char* p = new char[len + 1];
-	strcpy(p, s);
-	strcat(p, t.s);
-	delete[] s;
-	s = p;
-	cur = &s[len1 + len2 + 1];
-
-	return *this;
-}
-
-// Оператор проверки на равенство
-int operator==(MyString& a, MyString& b) {
-	return !a.cmp(b);
-}
-
-// Оператор проверки на неравенство
-int operator!=(MyString& a, MyString& b) {
-	if (a.cmp(b) == 0)
-		return 1;
-	return 0;
-}
-
-// Оператор проверки на меньше
-int operator<(MyString& a, MyString& b) {
-	return a.cmp(b) < 0;
-}
-
-// Оператор проверки на меньше либо равно
-int operator<=(MyString& a, MyString& b) {
-	return a.cmp(b) <= 0;
-}
-
-// Оператор проверки на больше
-int operator>(MyString& a, MyString& b) {
-	return a.cmp(b) > 0;
-}
-
-// Оператор проверки на больше либо равно
-int operator>=(MyString& a, MyString& b) {
-	return a.cmp(b) >= 0;
-}
-
-// Оператор соединения двух строк
-MyString operator+(const MyString& a, const MyString& b) {
-	MyString tmp(a);
-	tmp += b;
-	return tmp;
-}
-
-// Оператор вывода
-std::ostream& operator<<(std::ostream& os, MyString& ms) {
-	ms.output(os);
-	return os;
-}
-
-// Оператор ввода
-std::istream& operator>>(std::istream& is, MyString& ms) {
-	ms.input(is);
-	return is;
 }

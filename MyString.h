@@ -15,10 +15,13 @@ public:
 	~MyString();
 	int length();
 	int length() const;
+	char& item(int i);
 	MyString* copy();
-	int cmp(const MyString& t);
+	void assign(const MyString& t);
+	int cmp(const MyString& t) const;
+	int equal(const MyString& t) const;
 	int input(std::istream& cin);
-	int output(std::ostream& cout);
+	void output(std::ostream& cout) const;
 	// Начало новых функций
 	void resize(int newsize);
 	int find(int first, int last, const MyString& item);
@@ -32,18 +35,4 @@ public:
 	static MyString concate(const MyString& s1, const MyString& s2);
 	static MyString concate(MyString* arr, int count);
 	static MyString join(MyString* arr, int count, char c = ' ');
-	// Перегрузка операторов
-	MyString& operator=(const MyString&);
-	operator char* ();
-	char& operator[](int i);
-	MyString& operator+=(const MyString&);
-	friend int operator==(MyString&, MyString&);
-	friend int operator!=(MyString&, MyString&);
-	friend int operator<(MyString&, MyString&);
-	friend int operator<=(MyString&, MyString&);
-	friend int operator>(MyString&, MyString&);
-	friend int operator>=(MyString&, MyString&);
-	friend MyString operator+(const MyString&, const MyString&);
-	friend std::ostream& operator<<(std::ostream&, MyString&);
-	friend std::istream& operator>>(std::istream&, MyString&);
 };
