@@ -27,10 +27,10 @@ Client::~Client() {
 // Ввод информации про клиента
 int Client::input() {
 	std::cout << "Enter client name: ";
-	name.input();
+	std::cin >> name;
 
 	std::cout << "Enter city: ";
-	city.input();
+	std::cin >> city;
 
 	std::cout << "Enter phone: ";
 	std::cin >> phone;
@@ -46,10 +46,8 @@ int Client::input() {
 
 // Вывод информации про клиента
 void Client::output() {
-	std::cout << "Client name: ";
-	name.output();
-	std::cout << "City: ";
-	city.output();
+	std::cout << "Client name: " << name << std::endl;
+	std::cout << "City: " << city << std::endl;
 	std::cout << "Phone: " << phone << std::endl;
 	std::cout << "Age: " << age << std::endl;
 	std::cout << "Birth day:";
