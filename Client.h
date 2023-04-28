@@ -16,11 +16,20 @@ public:
 	Client(const Client& t);
 	void dispose();
 	~Client();
-	int input();
-	void output();
-	int cmp(const Client& t);
-	int equal(const Client& t);
+	int	input(std::istream& cin = std::cin);
+	void output(std::ostream& cout = std::cout) const;
+	int cmp(const Client& t) const;
+	int equal(const Client& t) const;
 	Client* copy();
+	// Перегрузка операторов
+	friend int operator == (const Client&, const Client&);
+	friend int operator != (const Client&, const Client&);
+	friend int operator < (const Client&, const Client&);
+	friend int operator <= (const Client&, const Client&);
+	friend int operator > (const Client&, const Client&);
+	friend int operator >= (const Client&, const Client&);
+	friend std::ostream& operator << (std::ostream&, const Client&);
+	friend std::istream& operator >> (std::istream&, Client&);
 };
 
 typedef Client* T; // Теперь таблица работает с абстрактным типом T

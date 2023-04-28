@@ -307,7 +307,7 @@ int MyDate::input(std::istream& cin) {
 // Вывод даты
 void MyDate::output(std::ostream& cout) const {
 	const char* s = MonthName[month], * ss = getDayOfWeek();
-	cout << day << " (" << ss << ") " << s << " (" << month << ") " << year << std::endl;
+	cout << day << " (" << ss << ") " << s << " (" << month << ") " << year;
 }
 
 // Перегрузка операторов
