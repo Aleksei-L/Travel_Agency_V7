@@ -266,13 +266,6 @@ MyDate MyDate::parser(char* s) {
 	return MyDate(s);
 }
 
-// Замена перегруженного оператора =
-void MyDate::assign(const MyDate& d) {
-	day = d.day;
-	month = d.month;
-	year = d.year;
-}
-
 // Освобождение памяти из-под экземпляра класса
 void MyDate::dispose() {}
 
@@ -298,11 +291,11 @@ int	MyDate::cmp(const MyDate& d) const {
 
 // Ввод даты
 int MyDate::input(std::istream& cin) {
-	std::cout << "Day:";
+	std::cout << "Day: ";
 	cin >> day;
-	std::cout << "Month:";
+	std::cout << "Month: ";
 	cin >> month;
-	std::cout << "Year:";
+	std::cout << "Year: ";
 	cin >> year;
 	if (!validate()) {
 		std::cout << "Error Data" << std::endl;
@@ -315,4 +308,106 @@ int MyDate::input(std::istream& cin) {
 void MyDate::output(std::ostream& cout) const {
 	const char* s = MonthName[month], * ss = getDayOfWeek();
 	cout << day << " (" << ss << ") " << s << " (" << month << ") " << year << std::endl;
+}
+
+// Перегрузка операторов
+
+// Оператор присваивания
+MyDate& MyDate::operator = (const MyDate dt) {
+	day = dt.day;
+	month = dt.month;
+	year = dt.year;
+	return *this;
+}
+
+// Оператор преобразования типа из MyDate в char *
+MyDate::operator const char* () {
+	return "MyDate";
+}
+
+// Оператор вывода
+std::ostream& operator << (std::ostream& out, const MyDate& other) {
+	other.output(out);
+	return out;
+}
+
+// Оператор ввода
+std::istream& operator >> (std::istream& in, MyDate& other) {
+	other.input(in);
+	return in;
+}
+
+// Оператор проверки на равенство
+int operator == (const MyDate& d1, const MyDate& d2) {
+	return d1.day == d2.day && d1.month == d2.month && d1.year == d2.year;
+}
+
+// Оператор проверки на неравенство
+int operator != (const MyDate& d1, const MyDate& d2) {
+	return d1.day != d2.day || d1.month != d2.month || d1.year != d2.year;
+}
+
+// Оператор проверки на меньшесть либо равенство
+int operator <= (const MyDate& d1, const MyDate& d2) {
+	return d1.cmp(d2) < 0 || d1.cmp(d2) == 0;
+}
+
+// Оператор проверки на большесть либо равенство
+int operator >= (const MyDate& d1, const MyDate& d2) {
+	return d1.cmp(d2) > 0 || d1.cmp(d2) == 0;
+}
+
+// Оператор проверки на меньшесть
+int operator < (const MyDate& d1, const MyDate& d2) {
+	return d1.cmp(d2) < 0;
+}
+
+// Оператор проверки на большесть
+int operator > (const MyDate& d1, const MyDate& d2) {
+	return d1.cmp(d2) > 0;
+}
+
+// Оператор сложения с присваиванием
+MyDate& MyDate::operator += (long d) {
+	addDays(d);
+	return *this;
+}
+
+// Оператор сложения
+MyDate operator + (const MyDate& dt, long d) {
+	MyDate Dt;
+	Dt = dt;
+	Dt += d;
+	return Dt;
+}
+
+// Оператор вычитания
+long operator - (const MyDate& d1, const MyDate& d2) {
+	return d1.toLong() - d2.toLong();
+}
+
+// Префиксный оператор инкремента
+MyDate& MyDate::operator ++ () {
+	*this += 1;
+	return *this;
+}
+
+// Постфиксный оператор инкремента
+MyDate MyDate::operator ++ (int) {
+	MyDate ret(*this);
+	*this += 1;
+	return ret;
+}
+
+// Префиксный оператор декремента
+MyDate& MyDate::operator -- () {
+	*this += -1;
+	return *this;
+}
+
+// Постфиксный оператор декремента
+MyDate MyDate::operator -- (int) {
+	MyDate ret(*this);
+	*this += -1;
+	return ret;
 }

@@ -38,8 +38,8 @@ int Client::input() {
 	std::cout << "Enter age: ";
 	std::cin >> age;
 
-	std::cout << "Enter birth's day, month and year: ";
-	birth.input();
+	std::cout << "Enter birth's day, month and year:" << std::endl;
+	std::cin >> birth;
 
 	return !std::cin.eof();
 }
@@ -50,8 +50,7 @@ void Client::output() {
 	std::cout << "City: " << city << std::endl;
 	std::cout << "Phone: " << phone << std::endl;
 	std::cout << "Age: " << age << std::endl;
-	std::cout << "Birth day:";
-	birth.output();
+	std::cout << "Birth day: " << birth << std::endl;
 }
 
 // Разница между клиентами
