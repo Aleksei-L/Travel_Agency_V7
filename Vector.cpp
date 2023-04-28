@@ -23,12 +23,12 @@ Vector::~Vector() {
 }
 
 // Возвращает указатель на начало вектора
-T* Vector::begin() {
+T* Vector::begin() const {
 	return v;
 }
 
 // Возвращает указатель на конец вектора
-T* Vector::end() {
+T* Vector::end() const {
 	return v + size;
 }
 
@@ -54,4 +54,12 @@ void Vector::resize(int n) {
 	delete[] v;
 	v = t;
 	size += n;
+}
+
+// Перегрузка операторов
+T& Vector::operator [] (int i) {
+	if (i >= 0 && i < size)
+		return v[i];
+	std::cout << "Index error" << std::endl;
+	exit(1);
 }

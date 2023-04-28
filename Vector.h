@@ -10,9 +10,11 @@ public:
 	Vector(int sz);
 	Vector(const Vector&);
 	~Vector();
-	T* begin();
-	T* end();
+	T* begin() const;
+	T* end() const;
 	int getSize();
 	T& item(int);
 	void resize(int);
+	// Перегрузка операторов
+	T& operator [] (int);
 };
