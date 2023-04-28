@@ -94,7 +94,7 @@ int MyDate::getYear() const {
 }
 
 // Возвращает день недели соответствующий дате
-char* MyDate::getDayOfWeek() {
+char* MyDate::getDayOfWeek() const {
 	long dd = (toLong()) % 7 + 1;
 	char* s = new char[strlen(DayNames[dd]) + 1];
 	strcpy(s, DayNames[dd]);
@@ -211,7 +211,7 @@ int MyDate::isYearLeap(int y) {
 }
 
 // Перевод даты в число
-unsigned long MyDate::toLong() {
+unsigned long MyDate::toLong() const {
 	unsigned long d, m, y;
 	d = day;
 	y = 1;
@@ -282,12 +282,12 @@ MyDate* MyDate::copy() {
 }
 
 // Проверка дат на равенство
-int	MyDate::equal(const MyDate& d) {
+int	MyDate::equal(const MyDate& d) const {
 	return day == d.day && month == d.month && year == d.year;
 }
 
 // Сравнение двух дат
-int	MyDate::cmp(const MyDate& d) {
+int	MyDate::cmp(const MyDate& d) const {
 	if (year != d.year)
 		return year - d.year;
 	else if (month != d.month)
@@ -296,23 +296,23 @@ int	MyDate::cmp(const MyDate& d) {
 		return day - d.day;
 }
 
-// Ввод из файла
-int	MyDate::input(File fp) {
-	int state = fscanf(fp, "%d\t%d\t%d", &day, &month, &year);
-	return state != EOF;
+// Ввод даты
+int MyDate::input(std::istream& cin) {
+	std::cout << "Day:";
+	cin >> day;
+	std::cout << "Month:";
+	cin >> month;
+	std::cout << "Year:";
+	cin >> year;
+	if (!validate()) {
+		std::cout << "Error Data" << std::endl;
+		return day = month = year = 0;
+	}
+	return 1;
 }
 
-// Ввод с клавиатуры
-int	MyDate::input() {
-	return input(stdin);
-}
-
-// Вывод в файл
-int	MyDate::output(File fp) {
-	return fprintf(fp, "%d %d %d\n", day, month, year);
-}
-
-// Вывод на экран
-int MyDate::output() {
-	return output(stdout);
+// Вывод даты
+void MyDate::output(std::ostream& cout) const {
+	const char* s = MonthName[month], * ss = getDayOfWeek();
+	cout << day << " (" << ss << ") " << s << " (" << month << ") " << year << std::endl;
 }

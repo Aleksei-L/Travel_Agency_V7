@@ -26,8 +26,7 @@ public:
 	int getMonth() const;
 	int getYear();
 	int getYear() const;
-	char* getDayOfWeek();
-	MyDate getNow();
+	char* getDayOfWeek() const;
 	void setDay(int d);
 	void setMonth(int m);
 	void setYear(int y);
@@ -36,7 +35,7 @@ public:
 	void addYears(long y);
 	int validate();
 	static int isYearLeap(int y);
-	unsigned long toLong();
+	unsigned long toLong() const;
 	char* toChar();
 	static int dayOfYear(int y, int m, int d);
 	static void dayOfMonth(int d, int y, int* m, int* dd);
@@ -44,10 +43,8 @@ public:
 	void assign(const MyDate& t);
 	void dispose();
 	MyDate* copy();
-	int equal(const MyDate& t);
-	int	cmp(const MyDate& t);
-	int	input(File fp);
-	int	input();
-	int	output(File fp);
-	int output();
+	int	equal(const MyDate& t) const;
+	int	cmp(const MyDate& t) const;
+	int	input(std::istream& cin = std::cin);
+	void output(std::ostream& cout = std::cout) const;
 };
