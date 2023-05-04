@@ -48,12 +48,16 @@ T& Vector::item(int it) {
 
 // Изменение размера вектора
 void Vector::resize(int n) {
-	T* t = new T[size + n];
+	if (n < size) {
+		std::cout << "Resize error in Vector class" << std::endl;
+		return;
+	}
+	T* t = new T[n];
 	for (int i = 0; i < size; i++)
 		t[i] = v[i];
 	delete[] v;
 	v = t;
-	size += n;
+	size = n;
 }
 
 // Перегрузка операторов

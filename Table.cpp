@@ -1,8 +1,13 @@
 #include "Table.h"
 #include <algorithm>
 
-// Конструктор таблицы
-Table::Table(int s): v(s) {
+// Конструктор по умолчанию
+Table::Table() : v(10), buf(0) {
+	current = v.begin();
+}
+
+// Конструктор с заданными значениями полей
+Table::Table(int s, T b) : v(s), buf(b) {
 	current = v.begin();
 }
 
@@ -12,12 +17,12 @@ Table::~Table() {
 }
 
 // Возвращает указатель на первый элемент таблицы
-T* Table::begin() {
+T* Table::begin() const {
 	return v.begin();
 }
 
 // Возвращает указатель на первый свободный элемент таблицы
-T* Table::end() {
+T* Table::end() const {
 	return current;
 }
 
@@ -49,13 +54,11 @@ void Table::clear() {
 	current = begin();
 }
 
-// Увеличение размера таблицы на plusSize элементов
+// Изменение размера таблицы на plusSize элементов
 void Table::resize(int plusSize) {
-	if (plusSize <= 0) {
-		std::cout << "Wrong size!" << std::endl;
-		return;
-	}
+	int temp = length();
 	v.resize(plusSize);
+	current = &v[v.getSize() - temp];
 }
 
 // Вставка нового клиента в таблицу
@@ -66,29 +69,30 @@ T* Table::insert(const T& newClient) {
 }
 
 // Ввод таблицы
-int Table::input(T item) {
-	int count;
+int Table::input(std::istream& cin) {
+	int count = 0;
 	if (length() == getSize()) {
 		std::cout << "Size over, enter new size: ";
 		int newSize;
 		std::cin >> newSize;
-		resize(newSize * 2);
+		resize(newSize);
 	}
-	for (count = 0; length() != getSize(); count++) {
-		if (!item->input())
+	for (int i = length(); i < getSize(); i++) {
+		//for (count = 0; length() != getSize(); count++) {
+		if (!buf->input())
 			break;
-		insert(item);
+		insert(buf);
 	}
 	return count;
 }
 
 // Вывод таблицы
-void Table::output() {
+void Table::output(std::ostream& cout) const {
 	bool flag = false;
 	int counter = 1;
 	for (T* i = begin(); i != end(); i++) {
 		std::cout << "Client #" << counter++ << std::endl;
-		(*i)->output();
+		(*i)->output(cout);
 		flag = true;
 		std::cout << std::endl;
 	}
@@ -143,4 +147,18 @@ int Table::remove(const T& badClient) {
 	}
 	current = i;
 	return n;
+}
+
+// Перегрузка операторов
+
+// Оператор вывода
+std::ostream& operator << (std::ostream& os, const Table& r) {
+	r.output(os);
+	return os;
+}
+
+// Оператор ввода
+std::istream& operator >> (std::istream& is, Table& r) {
+	r.input(is);
+	return is;
 }

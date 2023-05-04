@@ -4,8 +4,9 @@ int main() {
 	int size, code, position;
 	std::cout << "Enter Table's size: ";
 	std::cin >> size;
-	Table myT(size);
 	Client first, second;
+	Client* buf = &first;
+	Table myT(size, buf);
 
 	while (true) {
 		std::cout << "Select the program operation mode:" << std::endl;
@@ -21,12 +22,12 @@ int main() {
 		switch (code) {
 		case 1:
 			std::cout << std::endl;
-			myT.input(&first);
+			std::cin >> myT;
 			std::cout << std::endl;
 			break;
 		case 2:
 			std::cout << std::endl;
-			myT.output();
+			std::cout << myT;
 			std::cout << std::endl;
 			break;
 		case 3:
@@ -37,7 +38,7 @@ int main() {
 		case 4:
 			std::cout << std::endl;
 			std::cout << "Enter client for Search:" << std::endl;
-			first.input();
+			std::cin >> first;
 			std::cout << "Client's index: " << myT.search(&first) << " (-1 if not founded)" << std::endl;
 			std::cout << std::endl;
 			break;
@@ -51,16 +52,16 @@ int main() {
 		case 6:
 			std::cout << std::endl;
 			std::cout << "Enter client for Remove:" << std::endl;
-			first.input();
+			std::cin >> first;
 			myT.remove(&first);
 			std::cout << std::endl;
 			break;
 		case 7:
 			std::cout << std::endl;
 			std::cout << "Enter old client for Replace:" << std::endl;
-			first.input();
+			std::cin >> first;
 			std::cout << "Enter new client for Replace:" << std::endl;
-			second.input();
+			std::cin >> second;
 			myT.replace(&first, &second);
 			std::cout << std::endl;
 			break;
