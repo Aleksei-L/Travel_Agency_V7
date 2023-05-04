@@ -78,8 +78,7 @@ int Table::input(std::istream& cin) {
 		resize(newSize);
 	}
 	for (int i = length(); i < getSize(); i++) {
-		//for (count = 0; length() != getSize(); count++) {
-		if (!buf->input())
+		if (!buf->input(std::cin))
 			break;
 		insert(buf);
 	}
@@ -104,8 +103,8 @@ void Table::output(std::ostream& cout) const {
 void Table::sort() {
 	for (int i = 0; i < getSize(); i++) {
 		for (int j = i + 1; j < getSize(); j++) {
-			if (v.item(i)->cmp(*v.item(j)) > 0)
-				std::swap(v.item(i), v.item(j));
+			if (*v[i] > *v[j])
+				std::swap(v[i], v[j]);
 		}
 	}
 }
@@ -113,7 +112,7 @@ void Table::sort() {
 // Поиск клиента в таблице, возвращает индекс найденного клиента или -1 если клиент не найден
 int Table::search(const T& tempClient) {
 	for (T* i = begin(); i < end(); i++) {
-		if ((*i)->equal(*tempClient))
+		if (**i == *tempClient)
 			return i - begin();
 	}
 	return -1;
@@ -123,7 +122,7 @@ int Table::search(const T& tempClient) {
 int Table::replace(const T& oldClient, const T& newClient) {
 	int counter = 0;
 	for (T* i = begin(); i < end(); i++) {
-		if ((*i)->equal(*oldClient)) {
+		if (**i == *oldClient) {
 			(*i)->dispose();
 			(*i) = (newClient)->copy();
 			counter++;
@@ -137,7 +136,7 @@ int Table::remove(const T& badClient) {
 	T* i = begin();
 	int n = 0;
 	for (T* j = begin(); j < end(); j++) {
-		if (!(*j)->equal(*badClient)) {
+		if (**j != *badClient) {
 			*i++ = *j;
 		}
 		else {
